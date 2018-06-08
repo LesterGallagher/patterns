@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Patterns</title>
+</head>
+
+<body>
+
+    <canvas width="600" height="600" id="c"></canvas>
+    <select id="select">
+        <option value="0">mutateRivers</option>
+        <option value="1">mutateDiag</option>
+        <option value="2">mutateIndividual</option>
+        <option value="3">crystalize</option>
+        <option value="4">mutateIndividual2</option>
+        <option value="5">mutateIndividual3</option>
+        <option value="6">caveFlicker</option>
+        <option value="7">pattern</option>
+        <option value="8">pattern2</option>
+        <option value="9">hmmmmm</option>
+        <option selected value="10">jungle</option>
+        <option value="11">cave</option>
+        <option value="12">diamond</option>
+        <option value="13">pattern3</option>
+    </select>
+
+    <script>
+        var c = document.getElementById('c');
+        var ctx = c.getContext('2d');
+        var dim = 60;
+        var grid = new Array(dim * dim);
+        var newGrid = new Array(dim * dim);
+
+        var mutations = [
+            mutateRivers,
+            mutateDiag,
+            mutateIndividual,
+            crystalize,
+            mutateIndividual2,
+            mutateIndividual3,
+            caveFlicker,
+            pattern,
+            pattern2,
+            hmmmmm,
+            jungle,
+            cave,
+            diamond,
+            pattern3
+        ];
+
+        document.getElementById('select').addEventListener('change', function (e) {
+            clearInterval(interval);
+            var i = +e.target.value;
+            var mutation = mutations[i];
+            random();
+            interval = setInterval(function () {
+                mutation();
+                for (let i = 0; i < grid.length; i++) {
+                    grid[i] = newGrid[i];
+                }
+                render();
+            }, 500);
+        });
+
+        random();
+
+        var interval = setInterval(function () {
+            jungle();
+            for (let i = 0; i < grid.length; i++) {
+                grid[i] = newGrid[i];
+            }
+            render();
+        }, 500);
+
+        function random() {
+            for (let i = 0; i < grid.length; i++) {
+                grid[i] = Math.random() < .5;
+            }
+        }
+
+        function render() {
+            for (let i = 0; i < grid.length; i++) {
+                ctx.fillStyle = grid[i] ? 'black' : 'white';
+                ctx.fillRect(i % dim * 10, Math.floor(i / dim * 10), 10, 10);
+            }
+        }
+
+        function mutateRivers() {
+            for (let i = 0; i < grid.length; i++) {
+                if (!grid[i + dim] && !grid[i - dim] && !grid[i + 1] && !grid[i - 1]
+                    && (grid[i + dim - 1] || grid[i + dim + 1] || grid[i - dim - 1] || grid[i - dim + 1])) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+        function mutateDiag() {
+            for (let i = 0; i < grid.length; i++) {
+                if (!grid[i] && (grid[i - dim + 1] || grid[i - dim + 1] === undefined) && Math.random() > .1) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+        function mutateIndividual() {
+            for (let i = 0; i < grid.length; i++) {
+                const count = grid[i - dim - 1] + grid[i - dim] + grid[i - dim + 1] + grid[i - 1] + grid[i] + grid[i + 1] + grid[i + dim - 1] + grid[i + dim] + grid[i + dim + 1];
+                if ((count > 5) || (count === 1)) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+        function crystalize() {
+            for (let i = 0; i < grid.length; i++) {
+                const count = grid[i - dim - 1] + grid[i - dim] + grid[i - dim + 1] + grid[i - 1] + grid[i] + grid[i + 1] + grid[i + dim - 1] + grid[i + dim] + grid[i + dim + 1];
+                if (count > 3 && count < 7) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+        function mutateIndividual2() {
+            for (let i = 0; i < grid.length; i++) {
+                const count = grid[i - dim - 1] + grid[i - dim] + grid[i - dim + 1] + grid[i - 1] + grid[i] + grid[i + 1] + grid[i + dim - 1] + grid[i + dim] + grid[i + dim + 1];
+                if (count < 3 || count > 6) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+        function mutateIndividual3() {
+            for (let i = 0; i < grid.length; i++) {
+                const count = grid[i - dim - 1] + grid[i - dim] + grid[i - dim + 1] + grid[i - 1] + grid[i] + grid[i + 1] + grid[i + dim - 1] + grid[i + dim] + grid[i + dim + 1];
+                if (count < 1 || count > 8) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+        function caveFlicker() {
+            for (let i = 0; i < grid.length; i++) {
+                const count = grid[i - dim - 1] + grid[i - dim] + grid[i - dim + 1] + grid[i - 1] + grid[i] + grid[i + 1] + grid[i + dim - 1] + grid[i + dim] + grid[i + dim + 1];
+                if (count < 5 && !grid[i]) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+        function pattern() {
+            for (let i = 0; i < grid.length; i++) {
+                const count = grid[i - dim - 1] + grid[i - dim] + grid[i - dim + 1] + grid[i - 1] + grid[i] + grid[i + 1] + grid[i + dim - 1] + grid[i + dim] + grid[i + dim + 1];
+                if (!grid[i] && !grid[i % 13 * 16]) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+        function pattern2() {
+            for (let i = 0; i < grid.length; i++) {
+                const count = grid[i - dim - 1] + grid[i - dim] + grid[i - dim + 1] + grid[i - 1] + grid[i] + grid[i + 1] + grid[i + dim - 1] + grid[i + dim] + grid[i + dim + 1];
+                if (!grid[i] && !grid[i % 13 * 72]) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+        function hmmmmm() {
+            for (let i = 0; i < grid.length; i++) {
+                const count = grid[i - dim - 1] + grid[i - dim] + grid[i - dim + 1] + grid[i - 1] + grid[i] + grid[i + 1] + grid[i + dim - 1] + grid[i + dim] + grid[i + dim + 1];
+                if (grid[(Math.floor(Math.pow(i, .9) % 14))]) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+        function jungle() {
+            for (let i = 0; i < grid.length; i++) {
+                const count = grid[i - dim - 1] + grid[i - dim] + grid[i - dim + 1] + grid[i - 1] + grid[i] + grid[i + 1] + grid[i + dim - 1] + grid[i + dim] + grid[i + dim + 1];
+                if (grid[(i * i) % dim * dim] === grid[i] && count < 6) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+        function cave() {
+            for (let i = 0; i < grid.length; i++) {
+                const count = grid[i - dim - 1] + grid[i - dim] + grid[i - dim + 1] + grid[i - 1] + grid[i] + grid[i + 1] + grid[i + dim - 1] + grid[i + dim] + grid[i + dim + 1];
+                if (count > 4) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+        function diamond() {
+            for (let i = 0; i < grid.length; i++) {
+                const count = grid[i - dim - 1] + grid[i - dim] + grid[i - dim + 1] + grid[i - 1] + grid[i] + grid[i + 1] + grid[i + dim - 1] + grid[i + dim] + grid[i + dim + 1];
+                if ((Math.random() > .7 && count < 6) || Math.abs((i % 60) - 30) + Math.abs((i / 60) - 30) < 10) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+        function pattern3() {
+            for (let i = 0; i < grid.length; i++) {
+                const count = grid[i - dim - 1] + grid[i - dim] + grid[i - dim + 1] + grid[i - 1] + grid[i] + grid[i + 1] + grid[i + dim - 1] + grid[i + dim] + grid[i + dim + 1];
+                if ((Math.random() < .99 && count > 4) || Math.abs((i % 60) - 30) + Math.abs((i / 60) - 30) < 10) {
+                    newGrid[i] = true;
+                }
+                else newGrid[i] = false;
+            }
+        }
+
+    </script>
+</body>
+
+</html>
